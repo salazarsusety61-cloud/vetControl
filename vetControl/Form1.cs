@@ -11,160 +11,182 @@ namespace vetControl
             InitializeComponent();
         }
 
-        // ========== 1. EVENTO LOAD ==========
-        private void Form1_Load(object sender, EventArgs e)
+        private void btnAgregar_Click(object sender, EventArgs e)
         {
-            this.Text = "VetControl - Registro de mascotas";
-            lblTotal.Text = "Mascotas: 0";
-            lblEtapa.Text = "-";
-            lblEtapa.BackColor = Color.White;
             lblMensaje.Text = "";
-        }
 
-        // ========== MÉTODOS AUXILIARES (los agregamos aquí) ==========
-        private void MostrarMensaje(string texto, Color color)
-        {
-            lblMensaje.Text = texto;
-            lblMensaje.ForeColor = color;
-        }
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
+            {
+                MessageBox.Show("Complete todos los campos.", "Datos no válidos",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return;
+            }
 
-        private void ActualizarTotal()
-        {
+            if (string.IsNullOrWhiteSpace(txtEspecie.Text))
+            {
+                MessageBox.Show("Complete todos los campos.", "Datos no válidos",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEspecie.Focus();
+                return;
+            }
+
+            if (!double.TryParse(txtEdad.Text, out double edad) || edad < 0)
+            {
+                MessageBox.Show("La edad debe ser un número mayor o igual a 0.", "Datos no válidos",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEdad.Focus();
+                return;
+            }
+
+            if (!double.TryParse(txtPeso.Text, out double peso) || peso <= 0)
+            {
+                MessageBox.Show("El peso debe ser mayor a 0.", "Datos no válidos",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPeso.Focus();
+                return;
+            }
+
+            string sexoTexto = txtSexo.Text.Trim().ToUpper();
+            if (sexoTexto != "M" && sexoTexto != "H")
+            {
+                MessageBox.Show("El sexo debe ser M o H.", "Datos no válidos",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtSexo.Focus();
+                return;
+            }
+            char sexo = sexoTexto[0];
+
+            if (lstServicios.SelectedIndex == -1)
+            {
+                MessageBox.Show("Seleccione un servicio.", "Datos no válidos",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            decimal costoBase;
+            string servicio = lstServicios.Text;
+            switch (servicio)
+            {
+                case "Consulta general": costoBase = 15000m; break;
+                case "Vacunación": costoBase = 20000m; break;
+                case "Desparasitación": costoBase = 10000m; break;
+                case "Baño": costoBase = 12000m; break;
+                default: costoBase = 0m; break;
+            }
+
+            double meses = edad * 12;
+            string etapa;
+            decimal descuento = 0m;
+
+            if (edad < 1)
+            {
+                etapa = "Cachorro";
+                lblEtapa.BackColor = Color.LightGreen;
+            }
+            else if (edad >= 7)
+            {
+                etapa = "Senior";
+                descuento = costoBase * 0.10m;
+                lblEtapa.BackColor = Color.Khaki;
+            }
+            else
+            {
+                etapa = "Adulto";
+                lblEtapa.BackColor = Color.LightBlue;
+            }
+
+            lblEtapa.Text = etapa;
+            lblMeses.Text = $"Edad en meses: {meses}";
+
+            decimal subtotal = costoBase - descuento;
+            decimal impuesto = subtotal * 0.13m;
+            decimal total = subtotal + impuesto;
+
+            lblCosto.Text = $"Descuento: ₡{descuento:N0}\nSubtotal: ₡{subtotal:N0}\nImpuesto 13%: ₡{impuesto:N0}\nTOTAL: ₡{total:N0}";
+
+            string sexoCompleto;
+            switch (sexo)
+            {
+                case 'M': sexoCompleto = "Macho"; break;
+                case 'H': sexoCompleto = "Hembra"; break;
+                default: sexoCompleto = "No definido"; break;
+            }
+
+            string linea = $"{txtNombre.Text.Trim()} ({sexoCompleto}) - {txtEspecie.Text.Trim()} - {etapa} - {servicio} - ₡{total:N0}";
+            lstMascotas.Items.Add(linea);
             lblTotal.Text = $"Mascotas: {lstMascotas.Items.Count}";
-        }
 
-        private void LimpiarCampos()
-        {
+            string resumen = $"Nombre: {txtNombre.Text.Trim()}\nServicio: {servicio}\nEtapa: {etapa}\nTotal: ₡{total:N0}";
+            MessageBox.Show(resumen, "Mascota registrada", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            lblMensaje.Text = "Mascota agregada correctamente";
+            lblMensaje.ForeColor = Color.Green;
+
             txtNombre.Clear();
             txtEspecie.Clear();
             txtEdad.Clear();
             txtPeso.Clear();
             txtSexo.Clear();
-            txtCosto.Clear();
+            lstServicios.SelectedIndex = -1;
             txtNombre.Focus();
         }
 
-        // ========== 2. BOTÓN AGREGAR ==========
-        private void btnAgregar_Click(object sender, EventArgs e)
-        {
-            // Campos vacíos
-            if (string.IsNullOrWhiteSpace(txtNombre.Text) ||
-                string.IsNullOrWhiteSpace(txtEspecie.Text) ||
-                string.IsNullOrWhiteSpace(txtEdad.Text) ||
-                string.IsNullOrWhiteSpace(txtPeso.Text) ||
-                string.IsNullOrWhiteSpace(txtSexo.Text) ||
-                string.IsNullOrWhiteSpace(txtCosto.Text))
-            {
-                MostrarMensaje("Complete todos los campos.", Color.Red);
-                return;
-            }
-
-            // Validar edad
-            if (!int.TryParse(txtEdad.Text, out int edad))
-            {
-                MostrarMensaje("La edad debe ser un número entero.", Color.Red);
-                return;
-            }
-            if (edad < 0 || edad > 30)
-            {
-                MostrarMensaje("La edad debe estar entre 0 y 30 años.", Color.Red);
-                return;
-            }
-
-            // Validar peso
-            if (!double.TryParse(txtPeso.Text, out double peso))
-            {
-                MostrarMensaje("El peso debe ser un número.", Color.Red);
-                return;
-            }
-            if (peso <= 0)
-            {
-                MostrarMensaje("El peso debe ser mayor que 0.", Color.Red);
-                return;
-            }
-
-            // Validar sexo
-            char sexo = char.Parse(txtSexo.Text);
-            if (sexo != 'M' && sexo != 'H')
-            {
-                MostrarMensaje("El sexo debe ser M o H.", Color.Red);
-                return;
-            }
-
-            // Validar costo
-            if (!decimal.TryParse(txtCosto.Text, out decimal costoBase))
-            {
-                MostrarMensaje("El costo debe ser un número.", Color.Red);
-                return;
-            }
-            if (costoBase <= 0)
-            {
-                MostrarMensaje("El costo debe ser mayor que 0.", Color.Red);
-                return;
-            }
-
-            // Edad en meses
-            int edadMeses = edad * 12;
-            lblMeses.Text = $"Edad en meses: {edadMeses}";
-
-            // Etapa de vida con color
-            string etapa;
-            if (edad < 1)
-            {
-                etapa = "Cachorro";
-                lblEtapa.BackColor = Color.LightSkyBlue;
-            }
-            else if (edad <= 7)
-            {
-                etapa = "Adulto";
-                lblEtapa.BackColor = Color.LightGreen;
-            }
-            else
-            {
-                etapa = "Senior";
-                lblEtapa.BackColor = Color.Khaki;
-            }
-            lblEtapa.Text = etapa;
-
-            // Cálculo de costo
-            decimal descuento = 0m;
-            if (edad < 1 || edad >= 8)
-            {
-                descuento = costoBase * 0.10m;
-            }
-            decimal subtotal = costoBase - descuento;
-            decimal impuesto = subtotal * 0.13m;
-            decimal total = subtotal + impuesto;
-
-            lblCosto.Text =
-                $"Descuento: ₡{descuento:N0}\n" +
-                $"Subtotal: ₡{subtotal:N0}\n" +
-                $"Impuesto 13%: ₡{impuesto:N0}\n" +
-                $"TOTAL A PAGAR: ₡{total:N0}";
-
-            // Agregar a la lista
-            lstMascotas.Items.Add(
-                $"{txtNombre.Text} ({sexo}) - {txtEspecie.Text} - {etapa} - ₡{total:N0}"
-            );
-
-            // Actualizar y limpiar
-            ActualizarTotal();
-            MostrarMensaje($"Mascota agregada: {txtNombre.Text}", Color.Green);
-            LimpiarCampos();
-        }
-
-        // ========== 3. BOTÓN LIMPIAR ==========
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
-            LimpiarCampos();
-            lblEtapa.Text = "-";
-            lblEtapa.BackColor = Color.White;
-            lblMeses.Text = "";
-            lblCosto.Text = "";
-            lblMensaje.Text = "";
+            DialogResult r = MessageBox.Show(
+                "¿Desea limpiar también los campos de texto?",
+                "Limpiar lista", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+            if (r == DialogResult.Yes)
+            {
+                lstMascotas.Items.Clear();
+                lblTotal.Text = "Mascotas: 0";
+                txtNombre.Clear(); txtEspecie.Clear(); txtEdad.Clear();
+                txtPeso.Clear(); txtSexo.Clear(); lstServicios.SelectedIndex = -1;
+                lblMensaje.Text = "Todo limpiado";
+                lblMensaje.ForeColor = Color.Blue;
+            }
+            else if (r == DialogResult.No)
+            {
+                lstMascotas.Items.Clear();
+                lblTotal.Text = "Mascotas: 0";
+                lblMensaje.Text = "Lista limpiada";
+                lblMensaje.ForeColor = Color.Blue;
+            }
         }
 
-        // ========== 4. BOTÓN COLOR ==========
+        private void eliminarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (lstMascotas.SelectedIndex == -1)
+            {
+                MessageBox.Show("Seleccione una mascota primero.", "Aviso",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string nombre = lstMascotas.SelectedItem.ToString();
+            DialogResult r = MessageBox.Show($"¿Eliminar a {nombre}?",
+                "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (r == DialogResult.Yes)
+            {
+                lstMascotas.Items.RemoveAt(lstMascotas.SelectedIndex);
+                lblTotal.Text = $"Mascotas: {lstMascotas.Items.Count}";
+                lblMensaje.Text = "Eliminado";
+                lblMensaje.ForeColor = Color.Blue;
+            }
+        }
+
+        private void btnSalir_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("¿Salir de VetControl?", "Confirmar salida",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                this.Close();
+            }
+        }
+
         private void btnColor_Click(object sender, EventArgs e)
         {
             if (colorDialog1.ShowDialog() == DialogResult.OK)
@@ -173,29 +195,24 @@ namespace vetControl
             }
         }
 
-        // ========== 5. BOTÓN SALIR ==========
-        private void btnSalir_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        // ========== 6. MENÚ: ELIMINAR ==========
-        private void eliminarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (lstMascotas.SelectedIndex == -1)
-            {
-                MostrarMensaje("Primero seleccione una mascota de la lista.", Color.Red);
-                return;
-            }
-            lstMascotas.Items.RemoveAt(lstMascotas.SelectedIndex);
-            ActualizarTotal();
-        }
-
-        // ========== 7. MENÚ: LIMPIAR LISTA ==========
         private void limpiarListaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            lstMascotas.Items.Clear();
-            ActualizarTotal();
+            btnLimpiar_Click(sender, e);
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblTotal_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
