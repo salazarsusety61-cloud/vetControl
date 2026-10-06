@@ -24,7 +24,6 @@
             txtEdad = new TextBox();
             txtPeso = new TextBox();
             txtSexo = new TextBox();
-            txtCosto = new TextBox();
             lblEtapa = new Label();
             lblMeses = new Label();
             lblCosto = new Label();
@@ -36,15 +35,17 @@
             btnSalir = new Button();
             lstMascotas = new ListBox();
             cmsLista = new ContextMenuStrip(components);
-            eliminarToolStripMenuItem = new ToolStripMenuItem();
-            limpiarListaToolStripMenuItem = new ToolStripMenuItem();
-            colorDialog1 = new ColorDialog();
+            mnuEliminar = new ToolStripMenuItem();
+            mnuLimpiar = new ToolStripMenuItem();
+            using var _ = colorDialog1 = new ColorDialog();
             label1 = new Label();
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
             label5 = new Label();
-            label6 = new Label();
+            lblServicios = new Label();
+            lstServicios = new ListBox();
+            mnuSalir = new ToolStripMenuItem();
             cmsLista.SuspendLayout();
             SuspendLayout();
             // 
@@ -99,14 +100,6 @@
             txtSexo.Name = "txtSexo";
             txtSexo.Size = new Size(114, 27);
             txtSexo.TabIndex = 6;
-            // 
-            // txtCosto
-            // 
-            txtCosto.Location = new Point(95, 363);
-            txtCosto.Margin = new Padding(3, 4, 3, 4);
-            txtCosto.Name = "txtCosto";
-            txtCosto.Size = new Size(114, 27);
-            txtCosto.TabIndex = 7;
             // 
             // lblEtapa
             // 
@@ -179,8 +172,8 @@
             btnColor.Name = "btnColor";
             btnColor.Size = new Size(86, 31);
             btnColor.TabIndex = 14;
-            btnColor.Text = "Color";
-            btnColor.Click += btnColor_Click;
+            btnColor.Text = "Color";            
+            
             // 
             // btnSalir
             // 
@@ -190,7 +183,7 @@
             btnSalir.Size = new Size(86, 31);
             btnSalir.TabIndex = 15;
             btnSalir.Text = "Salir";
-            btnSalir.Click += btnSalir_Click;
+            
             // 
             // lstMascotas
             // 
@@ -205,23 +198,23 @@
             // cmsLista
             // 
             cmsLista.ImageScalingSize = new Size(20, 20);
-            cmsLista.Items.AddRange(new ToolStripItem[] { eliminarToolStripMenuItem, limpiarListaToolStripMenuItem });
+            cmsLista.Items.AddRange(new ToolStripItem[] { mnuEliminar, mnuLimpiar, mnuSalir });
             cmsLista.Name = "cmsLista";
-            cmsLista.Size = new Size(160, 52);
+            cmsLista.Size = new Size(211, 104);
             // 
-            // eliminarToolStripMenuItem
+            // mnuEliminar
             // 
-            eliminarToolStripMenuItem.Name = "eliminarToolStripMenuItem";
-            eliminarToolStripMenuItem.Size = new Size(159, 24);
-            eliminarToolStripMenuItem.Text = "Eliminar";
-            eliminarToolStripMenuItem.Click += eliminarToolStripMenuItem_Click;
+            mnuEliminar.Name = "mnuEliminar";
+            mnuEliminar.Size = new Size(210, 24);
+            mnuEliminar.Text = "Eliminar";
+            mnuEliminar.Click += Eliminar_Click;
             // 
-            // limpiarListaToolStripMenuItem
+            // mnuLimpiar
             // 
-            limpiarListaToolStripMenuItem.Name = "limpiarListaToolStripMenuItem";
-            limpiarListaToolStripMenuItem.Size = new Size(159, 24);
-            limpiarListaToolStripMenuItem.Text = "Limpiar lista";
-            limpiarListaToolStripMenuItem.Click += limpiarListaToolStripMenuItem_Click;
+            mnuLimpiar.Name = "mnuLimpiar";
+            mnuLimpiar.Size = new Size(210, 24);
+            mnuLimpiar.Text = "Limpiar lista";
+           
             // 
             // label1
             // 
@@ -268,21 +261,38 @@
             label5.TabIndex = 22;
             label5.Text = "Sexo (M/H):";
             // 
-            // label6
+            // lblServicios
             // 
-            label6.AutoSize = true;
-            label6.Location = new Point(24, 366);
-            label6.Name = "label6";
-            label6.Size = new Size(50, 20);
-            label6.TabIndex = 23;
-            label6.Text = "Costo:";
+            lblServicios.AutoSize = true;
+            lblServicios.Location = new Point(19, 362);
+            lblServicios.Name = "lblServicios";
+            lblServicios.Size = new Size(68, 20);
+            lblServicios.TabIndex = 23;
+            lblServicios.Text = "Servicio :";
+           
+            // 
+            // lstServicios
+            // 
+            lstServicios.FormattingEnabled = true;
+            lstServicios.Items.AddRange(new object[] { "Consulta general", "Vacunación", "Desparasitación", "Baño" });
+            lstServicios.Location = new Point(260, 196);
+            lstServicios.Name = "lstServicios";
+            lstServicios.Size = new Size(150, 144);
+            lstServicios.TabIndex = 25;
+            // 
+            // mnuSalir
+            // 
+            mnuSalir.Name = "mnuSalir";
+            mnuSalir.Size = new Size(210, 24);
+            mnuSalir.Text = "Salir";
+            mnuSalir.Click += Salir_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(514, 867);
-            Controls.Add(label6);
+            Controls.Add(lstServicios);
             Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(label3);
@@ -294,7 +304,6 @@
             Controls.Add(txtEdad);
             Controls.Add(txtPeso);
             Controls.Add(txtSexo);
-            Controls.Add(txtCosto);
             Controls.Add(lblEtapa);
             Controls.Add(lblMeses);
             Controls.Add(lblCosto);
@@ -321,7 +330,6 @@
         private System.Windows.Forms.TextBox txtEdad;
         private System.Windows.Forms.TextBox txtPeso;
         private System.Windows.Forms.TextBox txtSexo;
-        private System.Windows.Forms.TextBox txtCosto;
         private System.Windows.Forms.Label lblEtapa;
         private System.Windows.Forms.Label lblMeses;
         private System.Windows.Forms.Label lblCosto;
@@ -333,14 +341,16 @@
         private System.Windows.Forms.Button btnSalir;
         private System.Windows.Forms.ListBox lstMascotas;
         private System.Windows.Forms.ContextMenuStrip cmsLista;
-        private System.Windows.Forms.ToolStripMenuItem eliminarToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem limpiarListaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem mnuEliminar;
+        private System.Windows.Forms.ToolStripMenuItem mnuLimpiar;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private Label label1;
         private Label label2;
         private Label label3;
         private Label label4;
         private Label label5;
-        private Label label6;
+        private Label lblServicios;
+        private ListBox lstServicios;
+        private ToolStripMenuItem mnuSalir;
     }
 }
